@@ -1,4 +1,4 @@
-from nn_cost_function import nn_cost_function
+from nn_functions import nn_cost_function, nn_gradients_function
 from debug_initialize_weights import debug_initialize_weights
 from compute_numerical_gradient import compute_numerical_gradient
 import numpy as np
@@ -19,10 +19,14 @@ def check_nn_gradients(_lambda=0):
     y = np.mod(np.arange(1, m+1), num_labels).T
 
     nn_params = np.concatenate((theta1.T.ravel(), theta2.T.ravel()))
+
     def cost_function(p):
         return nn_cost_function(p, input_layer_size, hidden_layer_size, num_labels, x, y, _lambda)
 
-    cost, gradients = cost_function(nn_params)
+    def gradients_function(p):
+        return nn_gradients_function(p, input_layer_size, hidden_layer_size, num_labels, x, y, _lambda)
+
+    gradients = gradients_function(nn_params)
     num_gradients = compute_numerical_gradient(cost_function, nn_params)
 
     for i in range(len(gradients)):

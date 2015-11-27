@@ -20,8 +20,8 @@ def compute_numerical_gradient(cost_fn, theta):
     for p in range(len(theta)):
         # Set perturbation vector
         perturb[p] = e
-        loss1, _ = cost_fn(theta - perturb)
-        loss2, _ = cost_fn(theta + perturb)
+        loss1 = cost_fn(theta - perturb)
+        loss2 = cost_fn(theta + perturb)
         # Compute Numerical Gradient
         numgrad[p] = (loss2 - loss1) / (2*e)
         perturb[p] = 0
