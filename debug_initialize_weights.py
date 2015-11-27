@@ -16,4 +16,4 @@ def debug_initialize_weights(fan_out, fan_in):
 
     # Initialize W using "sin", this ensures that W is always of the same
     # values and will be useful for debugging
-    return np.reshape(np.sin(np.arange(length)), (fan_out, fan_in + 1)) / 10
+    return np.reshape(np.sin(np.arange(1, length+1)), (fan_out, fan_in + 1), order='F') / 10

@@ -14,7 +14,6 @@ def compute_numerical_gradient(cost_fn, theta):
     #        be the (approximately) the partial derivative of J with respect
     #        to theta(i).)
     #
-
     numgrad = np.zeros(theta.shape)
     perturb = np.zeros(theta.shape)
     e = 1e-4

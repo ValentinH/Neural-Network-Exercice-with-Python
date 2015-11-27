@@ -6,9 +6,9 @@ from sigmoid import sigmoid, sigmoid_gradient
 def nn_cost_function(nn_params, input_layer_size, hidden_layer_size, num_labels, x, y, _lambda):
 
     theta1 = np.reshape(nn_params[:hidden_layer_size * (input_layer_size + 1)],
-                        (hidden_layer_size, (input_layer_size + 1)))
+                        (hidden_layer_size, (input_layer_size + 1)), order='F')
     theta2 = np.reshape(nn_params[(hidden_layer_size * (input_layer_size + 1)):],
-                        (num_labels, (hidden_layer_size + 1)))
+                        (num_labels, (hidden_layer_size + 1)), order='F')
 
     m = x.shape[0]
 
@@ -35,22 +35,22 @@ def nn_cost_function(nn_params, input_layer_size, hidden_layer_size, num_labels,
     # Backward propagation to compute gradients
     delta3 = (a3 - y.T)
     delta2 = np.dot(theta2[:, 1:].T, delta3) * sigmoid_gradient(z2)
-    delta1 = np.dot(delta2, a1.T)
-    delta2 = np.dot(delta3, a2.T)
+    _Delta1 = np.dot(delta2, a1.T)
+    _Delta2 = np.dot(delta3, a2.T)
 
-    theta1_grad = (1/m) * delta1
-    theta2_grad = (1/m) * delta2
+    theta1_grad = (1/m) * _Delta1
+    theta2_grad = (1/m) * _Delta2
 
     # Regularize gradients
-    temp1 = theta1
+    temp1 = np.copy(theta1)
     temp1[:, 0] = 0
     theta1_grad += np.dot((_lambda/m),  temp1)
 
-    temp2 = theta2
+    temp2 = np.copy(theta2)
     temp2[:, 0] = 0
     theta2_grad += np.dot((_lambda/m), temp2)
 
-    gradients = np.concatenate((theta1_grad.ravel(), theta2_grad.ravel()))
+    gradients = np.concatenate((theta1_grad.T.ravel(), theta2_grad.T.ravel()))
 
     return j, gradients
 

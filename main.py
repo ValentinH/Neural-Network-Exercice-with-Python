@@ -33,17 +33,24 @@ print('Tests nn_cost_function with default data')
 test_theta1 = weights['Theta1']
 test_theta2 = weights['Theta2']
 
-nn_params = np.concatenate((test_theta1.ravel(), test_theta2.ravel()))
+nn_params = np.concatenate((test_theta1.T.ravel(), test_theta2.T.ravel()))
 
 _lambda = 0
-j = nn_cost_function(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y_test, _lambda)
+j, _ = nn_cost_function(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y_test, _lambda)
 print('\nCost without reg', j)
 print('(this value should be about 0.287629) \n')
 
 _lambda = 1
-j = nn_cost_function(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y_test, _lambda)
+j, _ = nn_cost_function(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y_test, _lambda)
 print('\nReal cost', j)
 print('(this value should be about 0.383770) \n')
+
+print('\nEvaluating sigmoid gradient...\n')
+
+g = sigmoid_gradient(np.array([1, -0.5, 0, 0.5, 1]))
+print('Sigmoid gradient evaluated at [1 -0.5 0 0.5 1]:\n  ')
+print(g)
+print('\n\n')
 
 print('Check gradients')
 check_nn_gradients()
