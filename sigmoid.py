@@ -7,4 +7,4 @@ def sigmoid(z):
 
 
 def sigmoid_gradient(z):
-    return np.dot(sigmoid(z), 1.0 - sigmoid(z))
+    return sigmoid(z) * 1.0 - sigmoid(z)

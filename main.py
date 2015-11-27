@@ -6,6 +6,7 @@ from display_data import display_data
 from nn_cost_function import nn_cost_function
 from rand_initialize_weights import rand_initialize_weights
 from sigmoid import sigmoid_gradient
+from check_nn_gradients import check_nn_gradients
 
 input_layer_size  = 400  # 20x20 Input Images of Digits
 hidden_layer_size = 25   # 25 hidden units
@@ -43,6 +44,10 @@ _lambda = 1
 j = nn_cost_function(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y_test, _lambda)
 print('\nReal cost', j)
 print('(this value should be about 0.383770) \n')
+
+print('Check gradients')
+check_nn_gradients()
+
 
 
 print('Initializing Neural Network Parameters for real computation...')
