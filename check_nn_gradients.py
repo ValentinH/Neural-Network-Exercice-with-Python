@@ -1,6 +1,5 @@
-from nn_functions import nn_cost_function, nn_gradients_function
-from debug_initialize_weights import debug_initialize_weights
-from compute_numerical_gradient import compute_numerical_gradient
+from nn_functions import compute_cost, compute_gradients, recode_labels
+from toolbox import debug_initialize_weights
 import numpy as np
 
 
@@ -18,13 +17,16 @@ def check_nn_gradients(_lambda=0):
     x = debug_initialize_weights(m, input_layer_size - 1)
     y = np.mod(np.arange(1, m+1), num_labels).T
 
+    yk = recode_labels(y, num_labels)
+    x_bias = np.r_[np.ones((1, x.shape[0] )), x.T]
+
     nn_params = np.concatenate((theta1.T.ravel(), theta2.T.ravel()))
 
     def cost_function(p):
-        return nn_cost_function(p, input_layer_size, hidden_layer_size, num_labels, x, y, _lambda)
+        return compute_cost(p, input_layer_size, hidden_layer_size, num_labels, x, y, _lambda, yk, x_bias)
 
     def gradients_function(p):
-        return nn_gradients_function(p, input_layer_size, hidden_layer_size, num_labels, x, y, _lambda)
+        return compute_gradients(p, input_layer_size, hidden_layer_size, num_labels, x, y, _lambda, yk, x_bias)
 
     gradients = gradients_function(nn_params)
     num_gradients = compute_numerical_gradient(cost_function, nn_params)
@@ -40,3 +42,20 @@ def check_nn_gradients(_lambda=0):
     print('If your backpropagation implementation is correct, then \n',
           'the relative difference will be small (less than 1e-9). \n',
           '\nRelative Difference: ', diff)
+
+
+def compute_numerical_gradient(cost_fn, theta):
+
+    numgrad = np.zeros(theta.shape)
+    perturb = np.zeros(theta.shape)
+    e = 1e-4
+    for p in range(len(theta)):
+        # Set perturbation vector
+        perturb[p] = e
+        loss1 = cost_fn(theta - perturb)
+        loss2 = cost_fn(theta + perturb)
+        # Compute Numerical Gradient
+        numgrad[p] = (loss2 - loss1) / (2*e)
+        perturb[p] = 0
+
+    return numgrad
