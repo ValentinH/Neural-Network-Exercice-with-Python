@@ -1,15 +1,11 @@
-
-import scipy.io
 import numpy as np
-import sys
-from scipy.optimize import fmin_cg
-
+import scipy.io
 from display_data import display_data
-from nn_functions import compute_cost, predict, train_model
-from toolbox import *
+from neural_network import compute_cost, predict, train_model
 from check_nn_gradients import check_nn_gradients
+from toolbox import sigmoid_gradient
 
-input_layer_size  = 400  # 20x20 Input Images of Digits
+input_layer_size = 400  # 20x20 Input Images of Digits
 hidden_layer_size = 25   # 25 hidden units
 num_labels = 10          # 10 labels, from 1 to 10
 
@@ -20,7 +16,8 @@ y = np.array(mat['y'])
 weights = scipy.io.loadmat('data/weights.mat')
 # decrease all example value by 1 since python is 0-based (0 will be K=1,  9->K=0)
 # for my tests, I will do 0->k=0
-y_test = np.array([y_val - 1 for y_val in y])
+#y_test = np.array([y_val if y_val < 10 else 0 for y_val in y]).flatten()
+y_test = np.array([y_val - 1 for y_val in y]).flatten()
 
 m = X.shape[0]
 
@@ -63,6 +60,7 @@ _lambda = 3
 check_nn_gradients(_lambda)
 
 # Also output the costFunction debugging values
+
 debug_J = compute_cost(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y_test, _lambda)
 
 print('\n\nCost at (fixed) debugging parameters (w/ lambda = 3): ', debug_J,

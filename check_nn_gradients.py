@@ -1,4 +1,4 @@
-from nn_functions import compute_cost, compute_gradients, recode_labels
+from neural_network import compute_cost, compute_gradients, recode_labels
 from toolbox import debug_initialize_weights
 import numpy as np
 
@@ -31,17 +31,14 @@ def check_nn_gradients(_lambda=0):
     gradients = gradients_function(nn_params)
     num_gradients = compute_numerical_gradient(cost_function, nn_params)
 
+    print('Gradients:')
+
     for i in range(len(gradients)):
         print(num_gradients[i], gradients[i])
 
-    print('The above two columns you get should be very similar.\n',
-          '(Left-Your Numerical Gradient, Right-Analytical Gradient)\n\n')
-
     diff = np.linalg.norm(num_gradients-gradients) / np.linalg.norm(num_gradients+gradients)
 
-    print('If your backpropagation implementation is correct, then \n',
-          'the relative difference will be small (less than 1e-9). \n',
-          '\nRelative Difference: ', diff)
+    print('\nRelative Difference: ', diff)
 
 
 def compute_numerical_gradient(cost_fn, theta):

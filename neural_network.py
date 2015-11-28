@@ -2,7 +2,7 @@ import numpy as np
 import sys
 from scipy.optimize import fmin_cg
 
-from toolbox import *
+from toolbox import sigmoid, unroll_thetas, recode_labels, sigmoid_gradient, rand_initialize_weights
 
 
 def feed_forward(theta1, theta2, x, x_bias=None):
@@ -29,10 +29,10 @@ def compute_cost(nn_params, input_layer_size, hidden_layer_size, num_labels, x, 
 
     term1 = -yk * np.log(a3)
     term2 = (1 - yk) * np.log(1 - a3)
-    left_term = np.sum(term1 - term2) / m
-    right_term = np.sum(theta1[:, 1:] ** 2) + np.sum(theta2[:, 1:] ** 2)
+    cost = np.sum(term1 - term2) / m
+    reg_cost = (np.sum(theta1[:, 1:] ** 2) + np.sum(theta2[:, 1:] ** 2)) * _lambda / (2 * m)
 
-    return left_term + right_term * _lambda / (2 * m)
+    return cost + reg_cost
 
 
 def compute_gradients(nn_params, input_layer_size, hidden_layer_size, num_labels, x, y, _lambda, yk=None, x_bias=None):
@@ -46,22 +46,20 @@ def compute_gradients(nn_params, input_layer_size, hidden_layer_size, num_labels
 
     # Backward propagation to compute gradients
     sigma3 = a3 - yk
-    sigma2 = theta2.T.dot(sigma3) * sigmoid_gradient(np.r_[np.ones((1, m)), z2])
-    sigma2 = sigma2[1:, :]
+    sigma2 = theta2[:, 1:].T.dot(sigma3) * sigmoid_gradient(z2)
 
-    accum1 = sigma2.dot(a1.T) / m
-    accum2 = sigma3.dot(a2.T) / m
-    accum1[:, 1:] = accum1[:, 1:] + (theta1[:, 1:] * _lambda / m)
-    accum2[:, 1:] = accum2[:, 1:] + (theta2[:, 1:] * _lambda / m)
-    accum = np.array([accum1.T.reshape(-1).tolist() + accum2.T.reshape(-1).tolist()]).T
+    theta1_grad = sigma2.dot(a1.T) / m
+    theta2_grad = sigma3.dot(a2.T) / m
+    theta1_grad[:, 1:] = theta1_grad[:, 1:] + (theta1[:, 1:] * _lambda / m)
+    theta2_grad[:, 1:] = theta2_grad[:, 1:] + (theta2[:, 1:] * _lambda / m)
 
-    return np.ndarray.flatten(accum)
+    return np.concatenate((theta1_grad.T.ravel(), theta2_grad.T.ravel()))
 
 
 def predict(theta1, theta2, x):
     m = x.shape[0]
     a1, a2, a3, z2, z3 = feed_forward(theta1, theta2, x)
-    return np.reshape(np.argmax(a3, axis=0), (m, 1))
+    return np.reshape(np.argmax(a3, axis=0), (m, 1)).flatten()
 
 
 iterations_counter = 0
@@ -74,7 +72,7 @@ def train_model(x, y, input_layer_size, hidden_layer_size, num_labels):
     initial_nn_params = np.concatenate((initial_theta1.T.ravel(), initial_theta2.T.ravel()))
 
     _lambda = 0.1
-    max_iterations = 100
+    max_iterations = 50
     iterations_counter = 0
 
     yk = recode_labels(y, num_labels)
