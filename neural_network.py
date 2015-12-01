@@ -62,9 +62,6 @@ def predict(theta1, theta2, x):
     return np.reshape(np.argmax(a3, axis=0), (m, 1)).flatten()
 
 
-iterations_counter = 0
-
-
 def train_model(x, y, input_layer_size, hidden_layer_size, num_labels):
 
     initial_theta1 = rand_initialize_weights(input_layer_size, hidden_layer_size)
@@ -73,19 +70,18 @@ def train_model(x, y, input_layer_size, hidden_layer_size, num_labels):
 
     _lambda = 0.1
     max_iterations = 50
-    iterations_counter = 0
+    iterations_counter = dict(val=0)
 
     yk = recode_labels(y, num_labels)
     x_bias = np.r_[np.ones((1, x.shape[0])), x.T]
 
     def show_progress(current_x):
-        global iterations_counter
-        iterations_counter += 1
-        progress = iterations_counter * 100 // max_iterations
+        iterations_counter['val'] += 1
+        progress = iterations_counter['val'] * 100 // max_iterations
         sys.stdout.write('\r[{0}{1}] {2}% - iter:{3}'.format(
             '=' * (progress // 5),
             ' ' * ((104 - progress) // 5),
-            progress, iterations_counter
+            progress, iterations_counter['val']
         ))
 
     # Solve!
